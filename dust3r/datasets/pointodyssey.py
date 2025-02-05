@@ -25,21 +25,6 @@ np.random.seed(125)
 torch.multiprocessing.set_sharing_strategy('file_system')
 
 class PointOdysseyDUSt3R(BaseStereoViewDataset):
-    #def __init__(self,
-    #             dataset_location='data/pointodyssey',
-    #             dset='train',
-    #             use_augs=False,
-    #             S=2,
-    #             N=16,
-    #             strides=[1,2,3,4,5,6,7,8,9],
-    #             clip_step=2,
-    #             quick=False,
-    #             verbose=True,
-    #             dist_type=None,
-    #             clip_step_last_skip = 0,
-    #             *args, 
-    #             **kwargs
-    #             ):
     def __init__(
             self,
             S,
@@ -51,23 +36,17 @@ class PointOdysseyDUSt3R(BaseStereoViewDataset):
             dist_type,
             clip_step_last_skip,
             *args, split, ROOT, **kwargs
-            #*args,
-            #ROOT,
-            #**kwargs
     ):
         self.ROOT = ROOT
         self.dataset_location = ROOT
         print('loading pointodyssey dataset...')
         super().__init__(*args, **kwargs)
         self.dataset_label = 'pointodyssey'
-        #self.split = dset
         self.split = split
         self.S = S # stride
         self.N = N # min num points
         self.verbose = verbose
 
-        #self.use_augs = use_augs
-        #self.dset = dset
         self.dset = split
 
         self.rgb_paths = []
@@ -104,38 +83,21 @@ class PointOdysseyDUSt3R(BaseStereoViewDataset):
                 print('seq', seq)
 
             rgb_path = os.path.join(seq, 'rgbs')
-            #####
-            #if self.dset == "train":
-            #    annotations_path = os.path.join(seq, "annotations.npz")
-            #else:
             annotations_path = os.path.join(seq, "anno.npz")
             info_path = os.path.join(seq, 'info.npz')
             annotations_path = os.path.join(seq, 'anno.npz')
             if os.path.isfile(info_path) and os.path.isfile(annotations_path):
-            #if os.path.isfile(annotations_path):
                 info = np.load(info_path, allow_pickle=True)
-                #info = np.load(annotations_path, allow_pickle=True)
                 trajs_3d_shape = info['trajs_3d'].astype(np.float32)
-                #trajs_3d_shape = info["trajs_3d"].astype(np.float32).shape
-                ####
 
-                if len(trajs_3d_shape) and trajs_3d_shape[1] > self.N:
-                #max_num_trajs = 9000 if self.dset == "train" else 100000
-                #if len(trajs_3d_shape) and trajs_3d_shape[1] > self.N and trajs_3d_shape[1] < max_num_trajs:
-                
+                if len(trajs_3d_shape) and trajs_3d_shape[1] > self.N: 
                     for stride in strides:
                         for ii in range(0,len(os.listdir(rgb_path))-self.S*max(stride,clip_step_last_skip)+1, clip_step):
-                        #for ii in range(1,len(os.listdir(rgb_path))-self.S*max(stride,clip_step_last_skip)+1, clip_step):
                             full_idx = ii + np.arange(self.S)*stride
                             self.rgb_paths.append([os.path.join(seq, 'rgbs', 'rgb_%05d.jpg' % idx) for idx in full_idx])
                             self.depth_paths.append([os.path.join(seq, 'depths', 'depth_%05d.png' % idx) for idx in full_idx])
                             self.normal_paths.append([os.path.join(seq, 'normals', 'normal_%05d.jpg' % idx) for idx in full_idx])
-                            ####
-                            #if self.dset == "train":
-                            #    self.annotation_paths.append(os.path.join(seq, 'annotations.npz'))
-                            #else:
                             self.annotation_paths.append(os.path.join(seq, 'anno.npz'))
-                            ####
                             self.full_idxs.append(full_idx)
                             self.sample_stride.append(stride)
                         if self.verbose:
@@ -163,7 +125,6 @@ class PointOdysseyDUSt3R(BaseStereoViewDataset):
             len(self.rgb_paths), self.S, self.dataset_location, self.dset))
         
         # Save common trajectories for pre-load efficiency in _get_views
-        print(f"{len(self.annotation_paths)=}, {len(set(self.annotation_paths))=}")
         annots_to_save = ["trajs_2d", "trajs_3d", "valids", "visibs"]
         for temp_annot_path in set(self.annotation_paths):
             print(f"{temp_annot_path=}")
@@ -172,13 +133,8 @@ class PointOdysseyDUSt3R(BaseStereoViewDataset):
             root_folder = f"/root/mast3r/pre_load_po_data{'' if self.dset == 'train' else '_TEST'}/{temp_seq_name}"
             os.makedirs(root_folder, exist_ok=True)
             for annot_to_save in annots_to_save:
-                print(f"{annot_to_save=}")
                 if not os.path.isfile(f"{root_folder}/{annot_to_save}.npy"):
-                    print(f"Saving to {root_folder}/{annot_to_save}.npy")
                     np.save(f"{root_folder}/{annot_to_save}.npy", arr=temp_annots[annot_to_save])
-                else:
-                    print(f"{root_folder}/{annot_to_save}.npy already exists!")
-
 
     def _resample_clips(self, strides, dist_type):
 
