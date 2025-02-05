@@ -84,10 +84,6 @@ class BaseStereoViewDataset (EasyDataset):
         for v, view in enumerate(views):
             assert 'pts3d' not in view, f"pts3d should not be there, they will be computed afterwards based on intrinsics+depthmap for view {view_name(view)}"
             view['idx'] = (idx, ar_idx, v)
-            ###
-            #view["is_metric_scale"] = False
-            #view["sky_mask"] = (view["depthmap"] < 0)
-            ###
 
             # encode the image
             width, height = view['img'].size

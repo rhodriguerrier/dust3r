@@ -10,17 +10,11 @@ from .megadepth import MegaDepth  # noqa
 from .scannetpp import ScanNetpp  # noqa
 from .staticthings3d import StaticThings3D  # noqa
 
-#from .waymo import Waymo  # noqa
-from .waymo_monst3r import Waymo # noqa
+from .waymo import Waymo  # noqa
 
 from .wildrgbd import WildRGBD  # noqa
 
-### MONSt3R
 from .pointodyssey import PointOdysseyDUSt3R  # noqa
-from .tartanair import TarTanAirDUSt3R # noqa
-from .spring_dataset import SpringDUSt3R  # noqa
-from .sintel import SintelDUSt3R  # noqa
-####
 
 
 def get_data_loader(dataset, batch_size, num_workers=8, shuffle=True, drop_last=True, pin_mem=True):
