@@ -104,6 +104,7 @@ class AsymmetricCroCo3DStereo (
             'encoder': [self.mask_token, self.patch_embed, self.enc_blocks],
         }
         freeze_all_params(to_be_frozen[freeze])
+        print(f'Freezing {freeze} parameters')
 
     def _set_prediction_head(self, *args, **kwargs):
         """ No prediction head """

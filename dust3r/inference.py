@@ -10,6 +10,8 @@ from dust3r.utils.device import to_cpu, collate_with_cat
 from dust3r.utils.misc import invalid_to_nans
 from dust3r.utils.geometry import depthmap_to_pts3d, geotrf
 
+import numpy as np
+from PIL import Image, ImageDraw
 
 def _interleave_imgs(img1, img2):
     res = {}
@@ -31,7 +33,27 @@ def make_batch_symmetric(batch):
 
 def loss_of_one_batch(batch, model, criterion, device, symmetrize_batch=False, use_amp=False, ret=None):
     view1, view2 = batch
-    ignore_keys = set(['depthmap', 'dataset', 'label', 'instance', 'idx', 'true_shape', 'rng'])
+
+    #img1_valids = Image.fromarray((view1['img'][0].permute(1,2,0).detach().cpu().numpy() * 255).astype(np.uint8))
+    #draw1_valids = ImageDraw.Draw(img1_valids)
+    #img2_valids = Image.fromarray((view2['img'][0].permute(1,2,0).detach().cpu().numpy() * 255).astype(np.uint8))
+    #draw2_valids = ImageDraw.Draw(img2_valids)
+    ## 100 valid and invalid points to check
+    #valid_counter = 0
+    #for i in range(view1['corres'].shape[1]):
+    #    (x1, y1), (x2, y2) = view1['corres'][0, i, :], view2['corres'][0, i, :]
+    #    if view1['valid_corres'][0, i] and view2['valid_corres'][0, i]:
+    #        valid_counter += 1
+    #        if valid_counter <= 100:
+    #            draw1_valids.ellipse([(x1-2, y1-2), (x1+2, y1+2)], fill=(255,0,0))
+    #            draw2_valids.ellipse([(x2-2, y2-2), (x2+2, y2+2)], fill=(255,0,0))
+    #        else:
+    #            break
+    #img1_valids.save(f"po_points_view1_corres_w_VIEW_MATCHES_384_AFTER_GPT.jpg")
+    #img2_valids.save(f"po_points_view2_corres_w_VIEW_MATCHES_384_AFTER_GPT.jpg")
+    #sys.exit(0)
+
+    ignore_keys = set(['depthmap', 'dataset', 'label', 'instance', 'idx', 'true_shape', 'rng', 'trajs_2d', 'vis_n_valids'])
     for view in batch:
         for name in view.keys():  # pseudo_focal
             if name in ignore_keys:

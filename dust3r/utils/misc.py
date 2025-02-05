@@ -5,6 +5,29 @@
 # utilitary functions for DUSt3R
 # --------------------------------------------------------
 import torch
+import numpy as np
+
+
+def get_stride_distribution(strides, dist_type='uniform'):
+
+    # input strides sorted by descreasing order by default
+    
+    if dist_type == 'uniform':
+        dist = np.ones(len(strides)) / len(strides)
+    elif dist_type == 'exponential':
+        lambda_param = 1.0
+        dist = np.exp(-lambda_param * np.arange(len(strides)))
+    elif dist_type.startswith('linear'): # e.g., linear_1_2
+        try:
+            start, end = map(float, dist_type.split('_')[1:])
+            dist = np.linspace(start, end, len(strides))
+        except ValueError:
+            raise ValueError(f'Invalid linear distribution format: {dist_type}')
+    else:
+        raise ValueError('Unknown distribution type %s' % dist_type)
+
+    # normalize to sum to 1
+    return dist / np.sum(dist)
 
 
 def fill_default_args(kwargs, func):

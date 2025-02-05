@@ -71,7 +71,8 @@ def get_args_parser():
     parser.add_argument("--disable_cudnn_benchmark", action='store_true', default=False,
                         help="set cudnn.benchmark = False")
     # others
-    parser.add_argument('--num_workers', default=8, type=int)
+    #parser.add_argument('--num_workers', default=8, type=int)
+    parser.add_argument('--num_workers', default=0, type=int)
     parser.add_argument('--world_size', default=1, type=int, help='number of distributed processes')
     parser.add_argument('--local_rank', default=-1, type=int)
     parser.add_argument('--dist_url', default='env://', help='url used to set up distributed training')
